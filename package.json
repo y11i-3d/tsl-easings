@@ -1,0 +1,82 @@
+{
+  "name": "@y11i-3d/tsl-easings",
+  "description": "Robert Penner's easing functions for Three.js Shader Language (TSL).",
+  "keywords": [
+    "easing",
+    "three",
+    "three.js",
+    "tsl",
+    "webgl",
+    "webgpu",
+    "glsl",
+    "wgsl",
+    "javascript",
+    "typescript"
+  ],
+  "version": "1.0.0",
+  "type": "module",
+  "sideEffects": [
+    "src/demo/**/*"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "bun run build-tsl && bun run build-demo",
+    "build-demo": "astro build",
+    "preview-demo": "astro preview",
+    "build-tsl": "rm -rf dist && tsc -p tsconfig.tsl.json"
+  },
+  "peerDependencies": {
+    "three": ">=0.183.0"
+  },
+  "devDependencies": {
+    "@astrojs/react": "^4.4.2",
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.2.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "0.183.0",
+    "astro": "^5.17.1",
+    "eslint": "^10.0.2",
+    "eslint-plugin-astro": "^1.6.0",
+    "globals": "^17.3.0",
+    "gsap": "^3.14.2",
+    "leva": "^0.10.1",
+    "lil-gui": "^0.21.0",
+    "prettier": "^3.8.1",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-astro-organize-imports": "^0.4.11",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.1",
+    "three": "0.183.0",
+    "typescript-eslint": "^8.56.1"
+  },
+  "volta": {
+    "node": "24.13.1"
+  },
+  "engines": {
+    "node": ">=24.13.1"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Yuichiroh Arai",
+    "url": "https://yuichiroharai.com/"
+  },
+  "repository": "github:y11i-3d/tsl-easings",
+  "homepage": "https://y11i-3d.github.io/tsl-easings/"
+}
