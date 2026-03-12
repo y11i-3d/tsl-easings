@@ -26,8 +26,8 @@ npm install @y11i-3d/tsl-easings
 import { float, uniform, vec3, vec4 } from "three/tsl";
 import { sineInOut } from "@y11i-3d/tsl-easings";
 
-const progress = uniform(float(0));
-material.colorNode = vec4(vec3(sineInOut(progress)), 1);
+const t = uniform(float(0));
+material.colorNode = vec4(vec3(sineInOut(t)), 1);
 ```
 
 ### Custom parameters
@@ -38,17 +38,29 @@ material.colorNode = vec4(vec3(sineInOut(progress)), 1);
 import { float, uniform, vec3, vec4 } from "three/tsl";
 import { customBackIn, customElasticOut } from "@y11i-3d/tsl-easings";
 
-const progress = uniform(float(0));
+const t = uniform(float(0));
 
 const overshoot = uniform(float(1.70158));
-material.colorNode = vec4(vec3(customBackIn(progress, overshoot)), 1);
+material.colorNode = vec4(vec3(customBackIn(t, overshoot)), 1);
 
 const amplitude = uniform(float(1));
 const period = uniform(float(0.3));
-material.colorNode = vec4(
-  vec3(customElasticOut(progress, amplitude, period)),
-  1,
-);
+material.colorNode = vec4(vec3(customElasticOut(t, amplitude, period)), 1);
+```
+
+### Inline vs named shader functions
+
+By default, easing functions are **inlined** into the shader code. If you call `.fn()`, the function is compiled as a **named shader function** (via `setLayout` + `overloadingFn`), which can reduce code duplication when the same easing is used multiple times.
+
+```ts
+import { sineInOut } from "@y11i-3d/tsl-easings";
+
+// Inline (default)
+material.colorNode = vec4(vec3(sineInOut(t)), 1);
+
+// Named shader function
+const sineInOutFn = sineInOut.fn();
+material.colorNode = vec4(vec3(sineInOutFn(t)), 1);
 ```
 
 ## API
@@ -70,13 +82,9 @@ All functions accept `float`, `vec2`, `vec3`, or `vec4` as input and return the 
 | elastic | `customElasticIn` | `customElasticOut` | `customElasticInOut` | `amplitude`, `period` |
 | bounce  | `bounceIn`        | `bounceOut`        | `bounceInOut`        |                       |
 
-All easing functions are compiled as **named shader functions** (via `setLayout`), not inlined.
-
 ### Convenience wrappers
 
 | Family  | In          | Out          | InOut          | Default values                  |
 | ------- | ----------- | ------------ | -------------- | ------------------------------- |
 | back    | `backIn`    | `backOut`    | `backInOut`    | `overshoot = 1.70158`           |
 | elastic | `elasticIn` | `elasticOut` | `elasticInOut` | `amplitude = 1`, `period = 0.3` |
-
-These are not compiled as shader functions — they simply call the corresponding `customBack*` / `customElastic*` with default values.
