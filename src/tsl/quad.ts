@@ -1,29 +1,23 @@
 import { select } from "three/tsl";
-import { type FunctionOverloadingNode, type Node } from "three/webgpu";
+import { type EaseSignature } from "./common.js";
 import { type FloatOrVectorNode } from "./types.js";
-import { createOverloadingHomoFn } from "./utils.js";
+import { createHomoFn } from "./utils.js";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export const quadIn = createOverloadingHomoFn(
+export const quadIn = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) => x.mul(x) as FloatOrVectorNode,
   "quadIn",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
-export const quadOut = createOverloadingHomoFn(
+export const quadOut = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) => x.mul(x.sub(2)).negate() as FloatOrVectorNode,
   "quadOut",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
-export const quadInOut = createOverloadingHomoFn(
+export const quadInOut = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) => {
     const p = x.mul(x).mul(2);
     return select(
@@ -34,9 +28,6 @@ export const quadInOut = createOverloadingHomoFn(
   },
   "quadInOut",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
 /* eslint-enable @typescript-eslint/no-explicit-any */

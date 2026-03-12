@@ -1,48 +1,39 @@
-import { select, sqrt, sub } from "three/tsl";
-import { type FunctionOverloadingNode, type Node } from "three/webgpu";
+import { max, select, sqrt, sub } from "three/tsl";
+import { type EaseSignature } from "./common.js";
 import { type FloatOrVectorNode } from "./types.js";
-import { createOverloadingHomoFn } from "./utils.js";
+import { createHomoFn } from "./utils.js";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export const circIn = createOverloadingHomoFn(
+export const circIn = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) =>
-    sqrt(x.mul(x).oneMinus() as any).oneMinus() as FloatOrVectorNode,
+    sqrt(max(x.mul(x).oneMinus(), 0) as any).oneMinus() as FloatOrVectorNode,
   "circIn",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
-export const circOut = createOverloadingHomoFn(
+export const circOut = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) =>
-    sqrt(sub(2, x).mul(x) as any) as FloatOrVectorNode,
+    sqrt(max(sub(2, x).mul(x), 0) as any) as FloatOrVectorNode,
   "circOut",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
-export const circInOut = createOverloadingHomoFn(
+export const circInOut = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) => {
     const t = x.mul(2).sub(2);
     return select(
       (x as any).lessThan(0.5),
-      sqrt(x.mul(x).mul(-4).add(1) as any)
+      sqrt(max(x.mul(x).mul(-4).add(1), 0) as any)
         .oneMinus()
         .mul(0.5),
-      sqrt(t.mul(t).oneMinus() as any)
+      sqrt(max(t.mul(t).oneMinus(), 0) as any)
         .add(1)
         .mul(0.5),
     ) as FloatOrVectorNode;
   },
   "circInOut",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
 /* eslint-enable @typescript-eslint/no-explicit-any */

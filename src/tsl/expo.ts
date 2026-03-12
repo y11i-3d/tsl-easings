@@ -1,11 +1,11 @@
 import { exp2, select } from "three/tsl";
-import { type FunctionOverloadingNode, type Node } from "three/webgpu";
+import { type EaseSignature } from "./common.js";
 import { type FloatOrVectorNode } from "./types.js";
-import { createOverloadingHomoFn } from "./utils.js";
+import { createHomoFn } from "./utils.js";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export const expoIn = createOverloadingHomoFn(
+export const expoIn = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) =>
     select(
       (x as any).lessThanEqual(0),
@@ -14,12 +14,9 @@ export const expoIn = createOverloadingHomoFn(
     ) as FloatOrVectorNode,
   "expoIn",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
-export const expoOut = createOverloadingHomoFn(
+export const expoOut = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) =>
     select(
       (x as any).greaterThanEqual(1),
@@ -28,12 +25,9 @@ export const expoOut = createOverloadingHomoFn(
     ) as FloatOrVectorNode,
   "expoOut",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
-export const expoInOut = createOverloadingHomoFn(
+export const expoInOut = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) =>
     select(
       (x as any).lessThanEqual(0),
@@ -50,9 +44,6 @@ export const expoInOut = createOverloadingHomoFn(
     ) as FloatOrVectorNode,
   "expoInOut",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
 /* eslint-enable @typescript-eslint/no-explicit-any */

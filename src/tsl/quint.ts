@@ -1,23 +1,20 @@
 import { select } from "three/tsl";
-import { type FunctionOverloadingNode, type Node } from "three/webgpu";
+import { type EaseSignature } from "./common.js";
 import { type FloatOrVectorNode } from "./types.js";
-import { createOverloadingHomoFn } from "./utils.js";
+import { createHomoFn } from "./utils.js";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export const quintIn = createOverloadingHomoFn(
+export const quintIn = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) => {
     const sq = x.mul(x);
     return sq.mul(sq).mul(x) as FloatOrVectorNode;
   },
   "quintIn",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
-export const quintOut = createOverloadingHomoFn(
+export const quintOut = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) => {
     const t = x.sub(1);
     const sq = t.mul(t);
@@ -25,12 +22,9 @@ export const quintOut = createOverloadingHomoFn(
   },
   "quintOut",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
-export const quintInOut = createOverloadingHomoFn(
+export const quintInOut = createHomoFn<EaseSignature, [FloatOrVectorNode]>(
   ([x]: [FloatOrVectorNode]) => {
     const t = x.sub(1);
     const tSq = t.mul(t);
@@ -42,9 +36,6 @@ export const quintInOut = createOverloadingHomoFn(
   },
   "quintInOut",
   ["x"],
-) as {
-  (x: number): Node<"float">;
-  <T extends FloatOrVectorNode>(x: T | number): T;
-} & FunctionOverloadingNode;
+);
 
 /* eslint-enable @typescript-eslint/no-explicit-any */

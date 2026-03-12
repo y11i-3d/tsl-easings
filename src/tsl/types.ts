@@ -1,4 +1,4 @@
-import { type Node } from "three/webgpu";
+import { type FunctionOverloadingNode, type Node } from "three/webgpu";
 
 export type FloatOrVectorNode =
   | Node<"float">
@@ -8,3 +8,11 @@ export type FloatOrVectorNode =
 
 export type FloatOrVectorNodeType =
   FloatOrVectorNode extends Node<infer T> ? T : never;
+
+export type JSHomoFn<T extends FloatOrVectorNode[] = FloatOrVectorNode[]> = (
+  args: T,
+) => FloatOrVectorNode;
+
+export type HomoFn<T> = T & {
+  fn(): T & FunctionOverloadingNode;
+};

@@ -56,31 +56,73 @@ function buildEasingMap(
   backOvershoot: Node<"float">,
   elasticAmplitude: Node<"float">,
   elasticPeriod: Node<"float">,
+  shaderFn: boolean,
 ) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pick = (fn: { fn(): any }) => (shaderFn ? fn.fn() : fn);
+
   const map: Record<string, EasingEntry> = {
-    sine: { in: sineIn, out: sineOut, inOut: sineInOut },
-    quad: { in: quadIn, out: quadOut, inOut: quadInOut },
-    cubic: { in: cubicIn, out: cubicOut, inOut: cubicInOut },
-    quart: { in: quartIn, out: quartOut, inOut: quartInOut },
-    quint: { in: quintIn, out: quintOut, inOut: quintInOut },
-    circ: { in: circIn, out: circOut, inOut: circInOut },
-    expo: { in: expoIn, out: expoOut, inOut: expoInOut },
+    sine: {
+      in: pick(sineIn),
+      out: pick(sineOut),
+      inOut: pick(sineInOut),
+    },
+    quad: { in: pick(quadIn), out: pick(quadOut), inOut: pick(quadInOut) },
+    cubic: {
+      in: pick(cubicIn),
+      out: pick(cubicOut),
+      inOut: pick(cubicInOut),
+    },
+    quart: {
+      in: pick(quartIn),
+      out: pick(quartOut),
+      inOut: pick(quartInOut),
+    },
+    quint: {
+      in: pick(quintIn),
+      out: pick(quintOut),
+      inOut: pick(quintInOut),
+    },
+    circ: { in: pick(circIn), out: pick(circOut), inOut: pick(circInOut) },
+    expo: { in: pick(expoIn), out: pick(expoOut), inOut: pick(expoInOut) },
     back: {
-      in: (x) => customBackIn(x, backOvershoot),
-      out: (x) => customBackOut(x, backOvershoot),
-      inOut: (x) => customBackInOut(x, backOvershoot),
+      in: (
+        (f) => (x: Node<"float">) =>
+          f(x, backOvershoot)
+      )(pick(customBackIn)),
+      out: (
+        (f) => (x: Node<"float">) =>
+          f(x, backOvershoot)
+      )(pick(customBackOut)),
+      inOut: (
+        (f) => (x: Node<"float">) =>
+          f(x, backOvershoot)
+      )(pick(customBackInOut)),
     },
     elastic: {
-      in: (x) => customElasticIn(x, elasticAmplitude, elasticPeriod),
-      out: (x) => customElasticOut(x, elasticAmplitude, elasticPeriod),
-      inOut: (x) => customElasticInOut(x, elasticAmplitude, elasticPeriod),
+      in: (
+        (f) => (x: Node<"float">) =>
+          f(x, elasticAmplitude, elasticPeriod)
+      )(pick(customElasticIn)),
+      out: (
+        (f) => (x: Node<"float">) =>
+          f(x, elasticAmplitude, elasticPeriod)
+      )(pick(customElasticOut)),
+      inOut: (
+        (f) => (x: Node<"float">) =>
+          f(x, elasticAmplitude, elasticPeriod)
+      )(pick(customElasticInOut)),
     },
-    bounce: { in: bounceIn, out: bounceOut, inOut: bounceInOut },
+    bounce: {
+      in: pick(bounceIn),
+      out: pick(bounceOut),
+      inOut: pick(bounceInOut),
+    },
   };
   return map;
 }
 
-const easingNames = Object.keys(buildEasingMap(null!, null!, null!));
+const easingNames = Object.keys(buildEasingMap(null!, null!, null!, false));
 const directions = ["in", "out", "inOut"];
 
 const MARGIN = 1 / 4;
@@ -127,17 +169,20 @@ export default function Demo() {
   const backOvershoot = useMemo(() => uniform(float(DEFAULT_OVERSHOOT)), []);
   const elasticAmplitude = useMemo(() => uniform(float(DEFAULT_AMPLITUDE)), []);
   const elasticPeriod = useMemo(() => uniform(float(DEFAULT_PERIOD)), []);
-  const easingMap = useMemo(
-    () => buildEasingMap(backOvershoot, elasticAmplitude, elasticPeriod),
-    [backOvershoot, elasticAmplitude, elasticPeriod],
-  );
   const tweenRef = useRef<gsap.core.Timeline | null>(null);
   const durationRef = useRef(1.2);
 
-  const { direction, duration } = useControls({
+  const { direction, duration, shaderFn } = useControls({
     direction: { value: "inOut", options: directions },
     duration: { value: 1.2, min: 0.4, max: 2.4, step: 0.4 },
+    shaderFn: { value: true, label: "Shader Function" },
   });
+
+  const easingMap = useMemo(
+    () =>
+      buildEasingMap(backOvershoot, elasticAmplitude, elasticPeriod, shaderFn),
+    [backOvershoot, elasticAmplitude, elasticPeriod, shaderFn],
+  );
 
   const backParams = useControls("Back", {
     overshoot: { value: DEFAULT_OVERSHOOT, min: 0, max: 3, step: 0.1 },
@@ -171,13 +216,13 @@ export default function Demo() {
     tl.restart();
   }, [duration, progress]);
 
-  // Rebuild color node when direction changes
+  // Rebuild color node when direction or shaderFn changes
   useEffect(() => {
     const material = materialRef.current;
     if (!material) return;
     material.colorNode = buildAllEasingsNode(direction, progress, easingMap);
     material.needsUpdate = true;
-  }, [direction]);
+  }, [direction, easingMap, progress]);
 
   // Three.js setup
   useEffect(() => {
